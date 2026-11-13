@@ -2,6 +2,7 @@
 """CLI entry point for mae."""
 
 import argparse
+import subprocess
 import sys
 
 from . import db, github, trailers
@@ -54,6 +55,26 @@ def cmd_prep(_args: argparse.Namespace) -> int:
     return 1
 
 
+def cmd_merge(args: argparse.Namespace) -> int:
+    print(f"Fetching patch for PR #{args.pr_number}...")
+    patch_data = github.fetch_pr_patch(args.pr_number)
+    
+    print(f"Applying PR #{args.pr_number} locally via git am...")
+    try:
+        # Pipe the patch directly into git am
+        subprocess.run(
+            ["git", "am"],
+            input=patch_data,
+            text=True,
+            check=True,
+        )
+        print("Successfully applied.")
+        return 0
+    except subprocess.CalledProcessError:
+        print("Failed to apply patch. You may have conflicts or a dirty tree.")
+        return 1
+
+
 def cmd_sync(_args: argparse.Namespace) -> int:
     print("mae sync: placeholder for Haiku-upstream synchronisation")
     return 0
@@ -79,6 +100,10 @@ def main() -> None:
 
     p_prep = sub.add_parser("prep", help="audit current branch for trailers")
     p_prep.set_defaults(func=cmd_prep)
+
+    p_merge = sub.add_parser("merge", help="fetch and apply a PR locally")
+    p_merge.add_argument("pr_number", type=int)
+    p_merge.set_defaults(func=cmd_merge)
 
     p_sync = sub.add_parser("sync", help="sync with Haiku upstream (placeholder)")
     p_sync.set_defaults(func=cmd_sync)
