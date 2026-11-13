@@ -1,0 +1,31 @@
+[project]
+name = "mae"
+version = "0.1.0"
+description = "A b4-inspired contribution workflow tool for RenkuOS"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = ["requests>=2.31"]
+
+[project.urls]
+Homepage = "https://github.com/vanmassey/mae"
+Issues = "https://github.com/vanmassey/mae/issues"
+
+[project.scripts]
+mae = "mae.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["mae*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
