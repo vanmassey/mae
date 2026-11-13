@@ -33,3 +33,14 @@ def fetch_comments(pr_number: int) -> list[dict]:
     resp = requests.get(url, headers=_headers(), timeout=30)
     resp.raise_for_status()
     return resp.json()
+
+
+def fetch_pr_patch(pr_number: int) -> str:
+    """Fetch the raw .patch file for a PR so it can be applied with git am."""
+    url = f"{API}/repos/{_repo()}/pulls/{pr_number}"
+    headers = _headers()
+    headers["Accept"] = "application/vnd.github.v3.patch"
+    
+    resp = requests.get(url, headers=headers, timeout=30)
+    resp.raise_for_status()
+    return resp.text
